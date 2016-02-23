@@ -21,7 +21,6 @@ class NewsView extends Component {
       loaded: false,
       newsItems: []
     };
-    this.fetchTop();
   }
 
   componentDidMount() {
