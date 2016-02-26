@@ -23,27 +23,25 @@ class NewsView extends Component {
     };
   }
 
-  componentDidMount() {
-    this.fetchTop();
+  async componentDidMount() {
+    let newsItems = await this.fetchTop();
+    this.setState({
+      newsItems,
+      loaded: true
+    });
   }
 
-  fetchTop() {
-    fetch(TOP_URL)
-    .then(response => response.json())
-    .then(responseData => {
-      let promises = responseData.slice(0, 20).map(item => {
-        return fetch(`${ITEM_URL}${item}.json`).then(response => response.json());
-      });
-      Promise.all(promises).then(arr => {
-        this.setState({
-          newsItems: arr,
-          loaded: true
-        });
-      }, reason => {
-        console.log(reason);
-      });
-    })
-    .done();
+  async fetchTop() {
+    try {
+      let top = (await (await fetch(TOP_URL)).json()).slice(0, 20);
+      let results = [];
+      for (let item of top) {
+        results.push(await (await fetch(`${ITEM_URL}${item}.json`)).json());
+      }
+      return results;
+    } catch (err) {
+      console.log(err);
+    }
   }
 
   onRowPressed(item) {
